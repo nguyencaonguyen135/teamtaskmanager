@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Task Management</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-tasks"></i>
+                    <span>TaskFlow</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-page="dashboard">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-page="kanban">
+                    <i class="fas fa-columns"></i>
+                    <span>Kanban Board</span>
+                </a>
+                <a href="#" class="nav-item" data-page="tasks">
+                    <i class="fas fa-check-circle"></i>
+                    <span>All Tasks</span>
+                </a>
+                <a href="#" class="nav-item" data-page="team">
+                    <i class="fas fa-users"></i>
+                    <span>Team</span>
+                </a>
+                <a href="#" class="nav-item" data-page="calendar">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Lịch</span>
+                </a>
+                <a href="#" class="nav-item" data-page="activity">
+                    <i class="fas fa-history"></i>
+                    <span>Nhật ký</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="avatar" id="userAvatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <span class="user-name" id="userName">User</span>
+                        <span class="user-role" id="userRole">Member</span>
+                    </div>
+                </div>
+                <button class="btn btn-logout" id="logoutBtn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Đăng xuất</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="page-title">Dashboard</h1>
+                </div>
+                <div class="header-right">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Tìm kiếm task... (Ctrl+K)" id="searchInput">
+                    </div>
+                    <button class="btn-icon" id="themeToggleBtn" title="Chuyển theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <div class="notification-wrapper">
+                        <button class="btn-icon" id="notificationBtn" title="Thông báo">
+                            <i class="fas fa-bell"></i>
+                        </button>
+                        <span class="notification-badge" id="notificationBadge">0</span>
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="notification-dropdown-header">
+                                <h3><i class="fas fa-bell"></i> Thông báo</h3>
+                                <button class="mark-read-btn" onclick="markAllNotificationsRead()">Đọc tất cả</button>
+                            </div>
+                            <div class="notification-list" id="notificationList">
+                                <div class="notification-empty">
+                                    <i class="fas fa-bell-slash"></i>
+                                    <p>Không có thông báo</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="addTaskBtn">
+                        <i class="fas fa-plus"></i>
+                        <span>Thêm Task</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard Page -->
+            <section class="page active" id="dashboard">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon total">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalTasks">0</h3>
+                            <p>Tổng Task</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon todo">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="todoTasks">0</h3>
+                            <p>Chờ xử lý</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon doing">
+                            <i class="fas fa-spinner"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="doingTasks">0</h3>
+                            <p>Đang làm</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon done">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="doneTasks">0</h3>
+                            <p>Hoàn thành</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon completion">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="completionRate">0%</h3>
+                            <p>Tỉ lệ hoàn thành</p>
+                            <div class="completion-bar">
+                                <div class="completion-fill" id="completionFill" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card recent-tasks">
+                        <div class="card-header">
+                            <h2><i class="fas fa-history"></i> Task gần đây</h2>
+                        </div>
+                        <div class="card-body" id="recentTasksList">
+                            <!-- Tasks will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="card overdue-tasks">
+                        <div class="card-header">
+                            <h2><i class="fas fa-exclamation-triangle"></i> Task quá hạn</h2>
+                        </div>
+                        <div class="card-body" id="overdueTasksList">
+                            <!-- Overdue tasks will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Kanban Page -->
+            <section class="page" id="kanban">
+                <div class="kanban-board">
+                    <div class="kanban-column" data-status="todo">
+                        <div class="column-header">
+                            <span class="column-title"><i class="fas fa-clock"></i> To Do</span>
+                            <span class="task-count" id="kanban-todo-count">0</span>
+                        </div>
+                        <div class="column-body" id="kanban-todo">
+                            <!-- Tasks will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="kanban-column" data-status="doing">
+                        <div class="column-header">
+                            <span class="column-title"><i class="fas fa-spinner"></i> Doing</span>
+                            <span class="task-count" id="kanban-doing-count">0</span>
+                        </div>
+                        <div class="column-body" id="kanban-doing">
+                            <!-- Tasks will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="kanban-column" data-status="done">
+                        <div class="column-header">
+                            <span class="column-title"><i class="fas fa-check-circle"></i> Done</span>
+                            <span class="task-count" id="kanban-done-count">0</span>
+                        </div>
+                        <div class="column-body" id="kanban-done">
+                            <!-- Tasks will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="kanban-column" data-status="blocked">
+                        <div class="column-header">
+                            <span class="column-title"><i class="fas fa-ban"></i> Blocked</span>
+                            <span class="task-count" id="kanban-blocked-count">0</span>
+                        </div>
+                        <div class="column-body" id="kanban-blocked">
+                            <!-- Tasks will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tasks Page -->
+            <section class="page" id="tasks">
+                <div class="tasks-toolbar">
+                    <div class="toolbar-row">
+                        <div class="filter-group">
+                            <select id="filterStatus">
+                                <option value="all">Tất cả trạng thái</option>
+                                <option value="todo">To Do</option>
+                                <option value="doing">Doing</option>
+                                <option value="done">Done</option>
+                                <option value="blocked">Blocked</option>
+                            </select>
+                            <select id="filterPriority">
+                                <option value="all">Tất cả độ ưu tiên</option>
+                                <option value="high">Cao</option>
+                                <option value="medium">Trung bình</option>
+                                <option value="low">Thấp</option>
+                            </select>
+                            <select id="filterAssignee">
+                                <option value="all">Tất cả người làm</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-secondary" id="exportCsvBtn">
+                            <i class="fas fa-file-csv"></i>
+                            <span>Xuất CSV</span>
+                        </button>
+                    </div>
+                    <div class="toolbar-row" style="margin-top:12px">
+                        <div class="filter-group">
+                            <input type="text" id="filterTag" placeholder="🏷 Lọc theo tag..." class="filter-input">
+                            <input type="date" id="filterDateFrom" class="filter-input" title="Deadline từ ngày">
+                            <input type="date" id="filterDateTo" class="filter-input" title="Deadline đến ngày">
+                            <button class="btn btn-secondary btn-sm" id="clearFiltersBtn">
+                                <i class="fas fa-times"></i> Xóa bộ lọc
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tasks-table-wrapper">
+                    <table class="tasks-table">
+                        <thead>
+                            <tr>
+                                <th class="sortable" data-sort="title">Task <i class="fas fa-sort sort-icon"></i></th>
+                                <th>Người phụ trách</th>
+                                <th class="sortable" data-sort="priority">Độ ưu tiên <i class="fas fa-sort sort-icon"></i></th>
+                                <th class="sortable" data-sort="deadline">Deadline <i class="fas fa-sort sort-icon"></i></th>
+                                <th class="sortable" data-sort="status">Trạng thái <i class="fas fa-sort sort-icon"></i></th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tasksTableBody">
+                            <!-- Tasks will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Team Page -->
+            <section class="page" id="team">
+                <div class="team-header">
+                    <h2>Thành viên Team</h2>
+                    <button class="btn btn-primary" id="addMemberBtn">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Thêm thành viên</span>
+                    </button>
+                </div>
+                
+                <div class="team-grid" id="teamGrid">
+                    <!-- Team members will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Calendar Page -->
+            <section class="page" id="calendar">
+                <div class="calendar-nav">
+                    <button class="btn btn-secondary" id="prevMonthBtn"><i class="fas fa-chevron-left"></i></button>
+                    <h2 id="calendarMonthTitle">Tháng</h2>
+                    <button class="btn btn-secondary" id="nextMonthBtn"><i class="fas fa-chevron-right"></i></button>
+                    <button class="btn btn-secondary btn-sm" id="todayBtn" style="margin-left:auto">
+                        <i class="fas fa-calendar-day"></i> Hôm nay
+                    </button>
+                </div>
+                <div id="calendarGrid" class="calendar-container"></div>
+            </section>
+
+            <!-- Activity Log Page -->
+            <section class="page" id="activity">
+                <div class="activity-page-header">
+                    <h2><i class="fas fa-history"></i> Nhật ký hoạt động</h2>
+                    <button class="btn btn-secondary btn-sm" id="clearActivityBtn">
+                        <i class="fas fa-trash"></i> Xóa log
+                    </button>
+                </div>
+                <div class="activity-log-list" id="activityLogList">
+                    <div class="empty-state"><i class="fas fa-history"></i><p>Chưa có hoạt động nào</p></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Task Modal -->
+    <div class="modal" id="taskModal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2 id="modalTitle">Thêm Task mới</h2>
+                <button class="close-btn" id="closeTaskModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <!-- Tabs (shown when editing) -->
+            <div class="modal-tabs" id="modalTabs" style="display:none">
+                <button class="modal-tab active" data-tab="details">
+                    <i class="fas fa-info-circle"></i> Chi tiết
+                </button>
+                <button class="modal-tab" data-tab="comments">
+                    <i class="fas fa-comments"></i> Bình luận
+                    <span class="tab-count" id="commentTabCount">0</span>
+                </button>
+                <button class="modal-tab" data-tab="attachments">
+                    <i class="fas fa-paperclip"></i> Tệp đính kèm
+                    <span class="tab-count" id="attachTabCount">0</span>
+                </button>
+            </div>
+            <!-- Details Tab -->
+            <div class="tab-panel active" id="tabDetails">
+            <form id="taskForm">
+                <input type="hidden" id="taskId">
+                <div class="form-group">
+                    <label for="taskTitle">Tiêu đề *</label>
+                    <input type="text" id="taskTitle" required placeholder="Nhập tiêu đề task...">
+                </div>
+                <div class="form-group">
+                    <label for="taskDescription">Mô tả</label>
+                    <textarea id="taskDescription" rows="3" placeholder="Mô tả chi tiết..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="taskAssignee">Người phụ trách</label>
+                        <select id="taskAssignee">
+                            <!-- Team members will be loaded here -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskPriority">Độ ưu tiên</label>
+                        <select id="taskPriority">
+                            <option value="low">Thấp</option>
+                            <option value="medium" selected>Trung bình</option>
+                            <option value="high">Cao</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="taskDeadline">Deadline</label>
+                        <input type="date" id="taskDeadline">
+                    </div>
+                    <div class="form-group">
+                        <label for="taskStatus">Trạng thái</label>
+                        <select id="taskStatus">
+                            <option value="todo">To Do</option>
+                            <option value="doing">Doing</option>
+                            <option value="done">Done</option>
+                            <option value="blocked">Blocked</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="taskTags">Tags <span class="label-hint">(cách nhau bằng dấu phẩy)</span></label>
+                    <input type="text" id="taskTags" placeholder="vd: frontend, bugfix, urgent...">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelTaskBtn">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu Task</button>
+                </div>
+            </form>
+            </div>
+            <!-- Comments Tab -->
+            <div class="tab-panel" id="tabComments">
+                <div class="comments-section">
+                    <div class="comments-list" id="commentsList">
+                        <div class="empty-state" style="padding:20px"><i class="fas fa-comments"></i><p>Chưa có bình luận</p></div>
+                    </div>
+                    <div class="comment-input-area">
+                        <textarea id="commentInput" placeholder="Viết bình luận..." rows="3"></textarea>
+                        <button class="btn btn-primary btn-sm" onclick="addComment()">
+                            <i class="fas fa-paper-plane"></i> Gửi
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Attachments Tab -->
+            <div class="tab-panel" id="tabAttachments">
+                <div class="attachments-section">
+                    <div class="attachments-list" id="attachmentsList">
+                        <div class="empty-state" style="padding:20px"><i class="fas fa-paperclip"></i><p>Chưa có tệp đính kèm</p></div>
+                    </div>
+                    <label class="file-upload-label" for="fileAttachInput">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Nhấp vào đây để chọn file</span>
+                        <small>Hỗ trợ mọi định dạng, tối đa 2MB/file</small>
+                    </label>
+                    <input type="file" id="fileAttachInput" multiple style="display:none" onchange="handleFileUpload(this.files)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Member Modal -->
+    <div class="modal" id="memberModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="memberModalTitle">Thêm thành viên</h2>
+                <button class="close-btn" id="closeMemberModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="memberForm">
+                <input type="hidden" id="memberId">
+                <div class="form-group">
+                    <label for="memberName">Tên *</label>
+                    <input type="text" id="memberName" required placeholder="Nhập tên thành viên...">
+                </div>
+                <div class="form-group">
+                    <label for="memberEmail">Email</label>
+                    <input type="email" id="memberEmail" placeholder="email@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="memberRole">Vai trò</label>
+                    <select id="memberRole">
+                        <option value="member">Member</option>
+                        <option value="lead">Team Lead</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="memberAvatar">Màu Avatar</label>
+                    <div class="color-picker">
+                        <input type="radio" name="avatarColor" value="#6366f1" id="color1" checked>
+                        <label for="color1" style="background: #6366f1"></label>
+                        <input type="radio" name="avatarColor" value="#8b5cf6" id="color2">
+                        <label for="color2" style="background: #8b5cf6"></label>
+                        <input type="radio" name="avatarColor" value="#ec4899" id="color3">
+                        <label for="color3" style="background: #ec4899"></label>
+                        <input type="radio" name="avatarColor" value="#14b8a6" id="color4">
+                        <label for="color4" style="background: #14b8a6"></label>
+                        <input type="radio" name="avatarColor" value="#f59e0b" id="color5">
+                        <label for="color5" style="background: #f59e0b"></label>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelMemberBtn">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2>Xác nhận xóa</h2>
+                <button class="close-btn" id="closeDeleteModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteMessage">Bạn có chắc chắn muốn xóa?</p>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="cancelDeleteBtn">Hủy</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Xóa</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
